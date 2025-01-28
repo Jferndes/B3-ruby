@@ -1,0 +1,25 @@
+<div class="container mx-auto max-w-3xl p-6 bg-white shadow-md rounded-lg">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Détails du suivi de poids</h1>
+
+  <div class="weight-entry-details space-y-4">
+    <div class="flex items-center">
+      <span class="text-gray-600 font-medium w-24">Poids :</span>
+      <span class="text-gray-900 text-lg"><%= @weight_entry.weight %> kg</span>
+    </div>
+    <div class="flex items-center">
+      <span class="text-gray-600 font-medium w-24">Date :</span>
+      <span class="text-gray-900 text-lg"><%= @weight_entry.date.strftime('%d/%m/%Y') %></span>
+    </div>
+  </div>
+
+  <div class="actions mt-8 flex space-x-4">
+    <%= link_to 'Modifier', edit_weight_entry_path(@weight_entry), 
+                class: 'bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600' %>
+    <%= link_to 'Supprimer', weight_entry_path(@weight_entry), 
+                method: :delete, 
+                data: { confirm: 'Êtes-vous sûr de vouloir supprimer cette entrée ?' }, 
+                class: 'bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' %>
+    <%= link_to 'Retour à la liste', weight_entries_path, 
+                class: 'bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600' %>
+  </div>
+</div>
