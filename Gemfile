@@ -57,3 +57,6 @@ group :test do
 end
 
 gem "tailwindcss-rails", "~> 3.3"
+gem "chartkick"
+gem 'rails-i18n', '~> 7.0.0'
+gem "devise"

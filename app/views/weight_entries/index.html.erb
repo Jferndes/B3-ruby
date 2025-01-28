@@ -1,8 +1,19 @@
 <div class="container mx-auto py-8">
-  <h1 class="text-4xl font-bold text-center text-blue-600 mb-6">Trackeuse de Poids</h1>
-  
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-4xl font-bold text-blue-600">Trackeuse de Poids</h1>
+
+    <!-- Bouton de déconnexion -->
+    <%= button_to "Se déconnecter", destroy_user_session_path, method: :delete, 
+      class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+
+  <div class="mb-4">
+    <%= line_chart @weight_entries.map { |entry| [entry.date, entry.weight] } %>
+  </div>
+
   <div class="flex justify-end mb-4">
-    <%= link_to "Ajouter une nouvelle entrée", new_weight_entry_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    <%= link_to "Ajouter une nouvelle entrée", new_weight_entry_path, 
+      class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
   </div>
 
   <div class="overflow-x-auto">
@@ -17,11 +28,11 @@
       <tbody>
         <% @weight_entries.each do |entry| %>
           <tr class="border-b border-gray-200 hover:bg-gray-100">
-            <td class="px-6 py-3 text-left text-gray-600 font-light"><%= entry.date %></td>
+            <td class="px-6 py-3 text-left text-gray-600 font-light"><%= entry.date.strftime("%d/%m/%Y") %></td>
             <td class="px-6 py-3 text-left text-gray-600 font-light"><%= entry.weight %></td>
             <td class="px-6 py-3 text-center">
-              <%= link_to "Voir", weight_entry_path(entry), class: "text-blue-500 hover:underline" %> |
-              <%= link_to "Modifier", edit_weight_entry_path(entry), class: "text-green-500 hover:underline" %> |
+              <%= link_to "Voir", weight_entry_path(entry), class: "text-blue-500 hover:underline" %><br>
+              <%= link_to "Modifier", edit_weight_entry_path(entry), class: "text-green-500 hover:underline" %><br>
               <%= button_to "Supprimer", weight_entry_path(entry), method: :delete, data: { turbo_confirm: "Êtes-vous sûr ?" }, class: "text-red-500 hover:underline" %>
             </td>
           </tr>
