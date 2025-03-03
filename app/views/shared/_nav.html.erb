@@ -1,0 +1,22 @@
+<nav class="bg-teal-700 text-white p-4"> 
+	<div class="container mx-auto flex justify-between items-center"> 
+		<div class="text-lg font-bold"> 
+			<%= link_to 'Mon Application', root_path, class: "hover:underline" %> 
+		</div>
+		
+		<div class="flex items-center justify-center">
+		<% if user_signed_in? %>
+			<span class="mr-4"><%= current_user.email %></span> 
+			<%= button_to destroy_user_session_path, method: :delete,
+                form: { data: { turbo_confirm: "Etes vous sûr ? ?" } },
+                class: "text-white hover:bg-red-700 bg-red-500 rounded px-4 py-2", title: "Déconnexion" do
+            %>
+                Déconnexion
+            <% end %>
+		<% else %> 
+			<%= link_to 'Connexion', new_user_session_path, class: "text-blue-300 hover:text-white mr-4" %> 
+			<%= link_to 'Inscription', new_user_registration_path, class: "text-blue-300 hover:text-white" %> 
+		<% end %>
+		</div>
+	</div>
+</nav>

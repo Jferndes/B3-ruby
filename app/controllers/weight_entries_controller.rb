@@ -4,7 +4,7 @@ class WeightEntriesController < ApplicationController
   
     # GET /weight_entries
     def index
-      @weight_entries = WeightEntry.order(date: :desc)
+      @weight_entries = current_user.weight_entries.order(date: :desc)
     end
   
     # GET /weight_entries/:id
@@ -15,12 +15,12 @@ class WeightEntriesController < ApplicationController
     def new
         # Remarque @variable : le @ permet d'utiliser la variable du controller vers la vue
         # .new = Constructeur de l'objet WeightEntry
-      @weight_entry = WeightEntry.new(date: Date.current)
+      @weight_entry = current_user.weight_entries.new(date: Date.current)
     end
   
     # POST /weight_entries
     def create
-      @weight_entry = WeightEntry.new(weight_entry_params)
+      @weight_entry = current_user.weight_entries.new(weight_entry_params)
   
         if @weight_entry.save
         redirect_to weight_entries_path, notice: 'Votre suivi de poids a été ajouté avec succès.'
@@ -54,7 +54,7 @@ class WeightEntriesController < ApplicationController
         end
 
         def set_weight_entry
-            @weight_entry = WeightEntry.find(params[:id])
+            @weight_entry = current_user.weight_entries.find(params[:id])
         end
     
 end
