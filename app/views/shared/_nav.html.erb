@@ -1,10 +1,9 @@
 <nav class="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4"> 
 	<div class="container mx-auto flex justify-between items-center"> 
 		<div class="text-lg font-bold flex items-center"> 
-			<%= link_to 'Mon Application', root_path, class: "hover:underline mr-6" %>
+			<%= link_to 'Tableau de bord', root_path, class: "hover:underline mr-6" %>
 			<% if user_signed_in? %>
 				<div class="flex space-x-4">
-					<%= link_to 'Tableau de bord', dashboard_index_path, class: "text-white hover:text-blue-200 text-sm" %>
 					<%= link_to 'Poids', weight_entries_path, class: "text-white hover:text-blue-200 text-sm" %>
 					<%= link_to 'Pas', step_entries_path, class: "text-white hover:text-blue-200 text-sm" %>
 				</div>
