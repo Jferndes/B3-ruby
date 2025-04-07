@@ -1,0 +1,143 @@
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+    <h1 class="text-4xl font-bold text-teal-700 mb-4 md:mb-0">Trackeuse de Pas</h1>
+    <%= link_to new_step_entry_path, 
+      class: "bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md flex items-center transition duration-300" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Nouvelle entrée
+    <% end %>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+    <div class="p-4 bg-gradient-to-r from-teal-500 to-teal-600">
+      <h2 class="text-xl font-semibold text-white">Évolution de vos pas quotidiens</h2>
+    </div>
+    <div class="p-4">
+      <%= column_chart @step_entries.map { |entry| [entry.date, entry.steps] },
+        colors: ["#0694a2"],
+        legend: false,
+        min: 0,
+        library: {
+          scales: {
+            y: {
+              grid: { color: "#E5E7EB" },
+              ticks: { font: { family: "Inter, sans-serif" } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { family: "Inter, sans-serif" } }
+            }
+          },
+          plugins: {
+            tooltip: {
+              backgroundColor: "#1F2937",
+              titleFont: { family: "Inter, sans-serif" },
+              bodyFont: { family: "Inter, sans-serif" }
+            }
+          }
+        } %>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="p-4 bg-gradient-to-r from-teal-500 to-teal-600 flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-white">Historique des entrées</h2>
+      <span class="text-teal-100 font-medium"><%= @step_entries.count %> entrée<%= @step_entries.count != 1 ? 's' : '' %></span>
+    </div>
+    
+    <% if @step_entries.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Date</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Pas</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <% @step_entries.each do |entry| %>
+              <tr class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700"><%= entry.date.strftime("%d/%m/%Y") %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= number_with_delimiter(entry.steps) %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  <div class="flex justify-center space-x-2">
+                    <%= link_to step_entry_path(entry), class: "text-blue-600 hover:text-blue-800 transition duration-150", title: "Voir les détails" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                      </svg>
+                    <% end %>
+                    
+                    <%= link_to edit_step_entry_path(entry), class: "text-yellow-600 hover:text-yellow-800 transition duration-150", title: "Modifier" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                    <% end %>
+                    
+                    <%= button_to step_entry_path(entry), method: :delete, data: { turbo_confirm: "Êtes-vous sûr de vouloir supprimer cette entrée ?" }, class: "text-red-600 hover:text-red-800 transition duration-150", title: "Supprimer" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="p-8 text-center">
+        <p class="text-gray-500 mb-4">Vous n'avez pas encore d'entrées de pas.</p>
+        <%= link_to new_step_entry_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Ajouter votre première entrée
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @step_entries.count >= 2 %>
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+      <% latest = @step_entries.first %>
+      <% previous = @step_entries.second %>
+      <% first = @step_entries.last %>
+      <% diff = latest.steps - previous.steps %>
+      <% total_steps = @step_entries.sum(&:steps) %>
+      <% avg_steps = @step_entries.average(:steps).to_i %>
+      
+      <!-- Card 1: Derniers pas -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Dernière mesure</h3>
+        <p class="text-3xl font-bold text-gray-900"><%= number_with_delimiter(latest.steps) %> pas</p>
+        <p class="text-sm text-gray-500 mt-1">Enregistré le <%= latest.date.strftime("%d/%m/%Y") %></p>
+      </div>
+      
+      <!-- Card 2: Différence avec dernière mesure -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Moyenne quotidienne</h3>
+        <p class="text-3xl font-bold text-teal-600"><%= number_with_delimiter(avg_steps) %> pas</p>
+        <p class="text-sm text-gray-500 mt-1">
+          Sur <%= @step_entries.count %> jour<%= @step_entries.count > 1 ? 's' : '' %>
+        </p>
+      </div>
+      
+      <!-- Card 3: Total pas -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Total des pas</h3>
+        <p class="text-3xl font-bold text-teal-600"><%= number_with_delimiter(total_steps) %></p>
+        <p class="text-sm text-gray-500 mt-1">
+          Depuis le <%= first.date.strftime("%d/%m/%Y") %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+</div>  

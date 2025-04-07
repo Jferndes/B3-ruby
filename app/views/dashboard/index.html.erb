@@ -1,4 +1,146 @@
-<div>
-  <h1 class="font-bold text-4xl">Dashboard#index</h1>
-  <p>Find me in app/views/dashboard/index.html.erb</p>
+<div class="max-w-7xl mx-auto py-1 px-4 sm:px-6 lg:px-8">
+  <h1 class="text-3xl font-bold text-teal-700 mb-8 text-center">Tableau de bord</h1>
+
+  <!-- Statistiques rapides -->
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    <!-- Carte Poids actuel -->
+    <% if @latest_weight %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Poids actuel</h3>
+        <p class="text-3xl font-bold text-gray-900"><%= @latest_weight.weight %> kg</p>
+        <p class="text-sm text-gray-500 mt-1">Mesuré le <%= @latest_weight.date.strftime("%d/%m/%Y") %></p>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Poids actuel</h3>
+        <p class="text-xl text-gray-500">Pas de données</p>
+      </div>
+    <% end %>
+
+    <!-- Carte Progression de poids -->
+    <% if @latest_weight && @first_weight && @latest_weight != @first_weight %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Progression</h3>
+        <p class="text-3xl font-bold <%= @total_weight_diff < 0 ? 'text-green-600' : (@total_weight_diff > 0 ? 'text-red-600' : 'text-gray-600') %>">
+          <%= @total_weight_diff == 0 ? '0' : (@total_weight_diff > 0 ? '+' : '') %><%= sprintf("%.1f", @total_weight_diff) %> kg
+        </p>
+        <p class="text-sm text-gray-500 mt-1">Depuis le <%= @first_weight.date.strftime("%d/%m/%Y") %></p>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Progression</h3>
+        <p class="text-xl text-gray-500">Pas de données</p>
+      </div>
+    <% end %>
+
+    <!-- Carte Pas aujourd'hui -->
+    <% if @latest_steps %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Derniers pas</h3>
+        <p class="text-3xl font-bold text-gray-900"><%= number_with_delimiter(@latest_steps.steps) %></p>
+        <p class="text-sm text-gray-500 mt-1">Le <%= @latest_steps.date.strftime("%d/%m/%Y") %></p>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Derniers pas</h3>
+        <p class="text-xl text-gray-500">Pas de données</p>
+      </div>
+    <% end %>
+
+    <!-- Carte Moyenne de pas -->
+    <% if @avg_steps && @step_entries.count > 0 %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Moyenne des pas</h3>
+        <p class="text-3xl font-bold text-teal-600"><%= number_with_delimiter(@avg_steps) %></p>
+        <p class="text-sm text-gray-500 mt-1">Sur <%= @step_entries.count %> jour<%= @step_entries.count > 1 ? 's' : '' %></p>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Moyenne des pas</h3>
+        <p class="text-xl text-gray-500">Pas de données</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Graphiques section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Graphique de poids -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="p-4 bg-gradient-to-r from-teal-500 to-teal-600 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-white">Évolution du poids</h2>
+        <%= link_to 'Voir tout', weight_entries_path, class: 'text-white text-sm hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if @weight_entries.any? %>
+          <%= line_chart @weight_entries.sort_by(&:date).map { |entry| [entry.date, entry.weight] },
+            colors: ["#0694a2"],
+            curve: true,
+            points: true,
+            legend: false,
+            min: (@weight_entries.map(&:weight).min&.floor || 0) - 1,
+            max: (@weight_entries.map(&:weight).max&.ceil || 100) + 1,
+            library: {
+              scales: {
+                y: {
+                  grid: { color: "#E5E7EB" },
+                  ticks: { font: { family: "Inter, sans-serif" } }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { font: { family: "Inter, sans-serif" } }
+                }
+              }
+            } %>
+        <% else %>
+          <div class="text-center py-16">
+            <p class="text-gray-500 mb-4">Aucune donnée de poids disponible</p>
+            <%= link_to new_weight_entry_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              Ajouter une entrée de poids
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Graphique de pas -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="p-4 bg-gradient-to-r from-teal-500 to-teal-600 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-white">Évolution des pas</h2>
+        <%= link_to 'Voir tout', step_entries_path, class: 'text-white text-sm hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if @step_entries.any? %>
+          <%= column_chart @step_entries.sort_by(&:date).map { |entry| [entry.date, entry.steps] },
+            colors: ["#0694a2"],
+            legend: false,
+            min: 0,
+            library: {
+              scales: {
+                y: {
+                  grid: { color: "#E5E7EB" },
+                  ticks: { font: { family: "Inter, sans-serif" } }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { font: { family: "Inter, sans-serif" } }
+                }
+              }
+            } %>
+        <% else %>
+          <div class="text-center py-16">
+            <p class="text-gray-500 mb-4">Aucune donnée de pas disponible</p>
+            <%= link_to new_step_entry_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              Ajouter une entrée de pas
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
 </div>
